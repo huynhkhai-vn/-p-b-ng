@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="./logo.png" type="image/x-icon" />
-    <title>Đập Bóng</title>
+    <title>Trò Chơi Đập Bóng</title>
     <style>
       body,
       html {
@@ -23,20 +23,47 @@
         height: 100%;
       }
 
-      #game-over {
+      #game-over,
+      #scoreboard,
+      #instructions {
         position: fixed;
+        text-align: center;
+        width: 100%;
+        z-index: 10;
+      }
+
+      #instructions {
+        top: 10px;
+        font-size: 20px;
+        color: white;
+        text-shadow: 1px 1px 2px black;
+      }
+
+      #scoreboard {
+        top: 50px;
+        font-size: 24px;
+        color: white;
+        text-shadow: 1px 1px 2px black;
+      }
+
+      #game-over {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 36px;
         color: red;
         display: none;
+        text-shadow: 1px 1px 2px black;
       }
     </style>
   </head>
   <body>
     <canvas id="balloons-canvas"></canvas>
-    <div id="game-over">Ahihi đồ ngu thua rồi</div>
+    <div id="instructions">
+      Nhấp vào các quả bóng để đập chúng trước khi chúng thoát khỏi màn hình!
+    </div>
+    <div id="scoreboard">Điểm: 0</div>
+    <div id="game-over">Bạn đã thua! Quả bóng đã vượt qua màn hình!</div>
 
     <script>
       // Thiết lập canvas và bối cảnh
@@ -45,9 +72,10 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      // Danh sách các quả bóng bay
+      // Biến trò chơi
       const balloons = [];
       let gameOver = false; // Biến kiểm tra xem trò chơi có kết thúc không
+      let score = 0; // Điểm số của người chơi
 
       // Tạo ra các quả bóng bay ngẫu nhiên
       function createBalloon() {
@@ -81,12 +109,6 @@
           if (balloon.y < -balloon.radius && !gameOver) {
             endGame();
           }
-
-          // Nếu bóng bay ra ngoài màn hình, tạo quả bóng mới
-          if (balloon.y < -balloon.radius) {
-            balloon.y = canvas.height + balloon.radius;
-            balloon.x = Math.random() * canvas.width;
-          }
         });
       }
 
@@ -100,6 +122,12 @@
       }
 
       animate(); // Bắt đầu vòng lặp animation
+
+      // Cập nhật điểm số
+      function updateScore() {
+        const scoreboard = document.getElementById("scoreboard");
+        scoreboard.textContent = `Điểm: ${score}`;
+      }
 
       // Kiểm tra sự kiện nhấp chuột và nổ quả bóng
       canvas.addEventListener("click", function (event) {
@@ -115,6 +143,10 @@
 
           // Kiểm tra nếu người dùng nhấp vào quả bóng
           if (Math.sqrt(dx * dx + dy * dy) < balloon.radius) {
+            // Tăng điểm số
+            score += 1;
+            updateScore();
+
             // Tạo hiệu ứng nổ (biến mất quả bóng)
             balloons.splice(i, 1); // Xóa quả bóng khỏi danh sách
 
